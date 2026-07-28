@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>My Search History</h1>
+
+{% if searches %}
+    <table class="history-table">
+        <thead>
+            <tr>
+                <th>Keyword</th>
+                <th>Location</th>
+                <th>Searched At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for search in searches %}
+            <tr>
+                <td>{{ search.keyword }}</td>
+                <td>{{ search.location }}</td>
+                <td>{{ search.searched_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>You haven't searched for anything yet. Go to <a href="{{ url_for('index') }}">Search</a> to get started.</p>
+{% endif %}
+{% endblock %}

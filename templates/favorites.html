@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>My Favorite Scholarships</h1>
+
+{% if favorites %}
+    <div id="favorites-list">
+        {% for item in favorites %}
+        <div class="result-card" id="favorite-{{ item.id }}">
+            <h3><a href="{{ item.link }}" target="_blank" rel="noopener">{{ item.title }}</a></h3>
+            <p class="source">{{ item.source_site }}</p>
+            <p>{{ item.snippet }}</p>
+            <button class="remove-btn" data-id="{{ item.id }}">Remove</button>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>You haven't saved any scholarships yet. Go to <a href="{{ url_for('index') }}">Search</a> to find some.</p>
+{% endif %}
+
+<script>
+document.querySelectorAll('.remove-btn').forEach(function (button) {
+    button.addEventListener('click', async function () {
+        const favoriteId = button.getAttribute('data-id');
+
+        const response = await fetch('/api/favorites/' + favoriteId, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            document.getElementById('favorite-' + favoriteId).remove();
+        } else {
+            alert('Could not remove this favorite. Please try again.');
+        }
+    });
+});
+</script>
+{% endblock %}

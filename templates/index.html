@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="hero">
+    <h1>Get a Job With Us</h1>
+    <p>Search real internships and remote jobs from Adzuna and Remotive. Save your favorites and track your search history.</p>
+</div>
+
+<form id="search-form">
+    <label for="keyword">Keyword</label>
+    <input type="text" id="keyword" name="keyword" placeholder="e.g. software engineer intern" required>
+
+    <label for="location">Location</label>
+    <select id="location" name="location" required>
+        <option value="">-- Select --</option>
+        <option value="remote">Remote</option>
+        <option value="us">United States</option>
+        <option value="gb">United Kingdom</option>
+        <option value="au">Australia</option>
+        <option value="de">Germany</option>
+        <option value="fr">France</option>
+        <option value="in">India</option>
+        <option value="ca">Canada</option>
+        <option value="nz">New Zealand</option>
+        <option value="za">South Africa</option>
+        <option value="pl">Poland</option>
+        <option value="nl">Netherlands</option>
+        <option value="it">Italy</option>
+        <option value="es">Spain</option>
+        <option value="at">Austria</option>
+        <option value="be">Belgium</option>
+        <option value="br">Brazil</option>
+        <option value="mx">Mexico</option>
+        <option value="sg">Singapore</option>
+        <option value="ch">Switzerland</option>
+    </select>
+
+    <button type="submit">Search</button>
+</form>
+
+<div id="search-status"></div>
+
+<div id="results-controls" style="display:none;">
+    <label for="filter-site">Filter by company:</label>
+    <select id="filter-site">
+        <option value="">All sources</option>
+    </select>
+
+    <label for="sort-order">Sort by:</label>
+    <select id="sort-order">
+        <option value="title-asc">Title (A-Z)</option>
+        <option value="title-desc">Title (Z-A)</option>
+        <option value="source-asc">Company (A-Z)</option>
+    </select>
+</div>
+
+<div id="results-list"></div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% endblock %}
