@@ -51,6 +51,8 @@ Running Locally
   ```bash
   python3 -m venv venv
   source venv/bin/activate   # Windows: venv\Scripts\activate
+```
+
 Install dependencies:
 pip install -r requirements.txt
 
@@ -83,7 +85,7 @@ Bonus Features Implemented
 
 User authentication: full register/login/logout system with hashed passwords
 Response caching : Flask-Caching avoids redundant external API calls for repeated searches
-Rate limiting : Flask-Limiter caps search requests per user per minute(10requests/min)
+Rate limiting : Flask-Limiter caps search requests per client IP per minute(10requests/min)
 Testing & Verification
 
 Each web server tested independently first: before touching the load balancer, Web01 and Web02 were each tested directly via their public IPs (curl -I and a browser check), confirming both served the login page correctly on their own.
