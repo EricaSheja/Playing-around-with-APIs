@@ -62,7 +62,9 @@ Running Locally
 4. Create a .env file in the project root (never committed — see .gitignore):
 
   ADZUNA_APP_ID=your_adzuna_app_id
+  
   ADZUNA_APP_KEY=your_adzuna_app_key
+  
   SECRET_KEY=any_long_random_string
 
 5. Get free Adzuna credentials at https://developer.adzuna.com/signup.
@@ -98,7 +100,9 @@ Each web server keeps its own local SQLite database. With plain round-robin bala
 Bonus Features Implemented
 
 1.User authentication: full register/login/logout system with hashed passwords
+
 2.Response caching : Flask-Caching avoids redundant external API calls for repeated searches
+
 3. Rate limiting : Flask-Limiter caps search requests per client IP per minute(10requests/min)
 
 Testing & Verification
