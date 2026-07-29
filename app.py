@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_caching import Cache
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from models import db, User, Favorite, SearchHistory
 
@@ -16,6 +19,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///scholarships.db'
 
 # Connect our database models (from models.py) to this app
 db.init_app(app)
+
+app.config['CACHE_TYPE'] = 'SimpleCache'
+app.config['CACHE_DEFAULT_TIMEOUT'] = 300  # 5 minutes
+cache = Cache(app)
+
+limiter = Limiter(get_remote_address, app=app, default_limits=[])
 
 # Set up Flask-Login to manage who is logged in
 login_manager = LoginManager()
@@ -109,6 +118,7 @@ def history():
 
 @app.route('/api/search', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute")
 def api_search():
     data = request.get_json()
     keyword = data.get('keyword', '').strip()
@@ -117,16 +127,25 @@ def api_search():
     if not keyword or not location:
         return jsonify({'error': 'Please fill in a keyword and choose a location.'}), 400
 
-    try:
-        if location.lower() == 'remote':
-            results = search_remotive(keyword)
-        else:
-            results = search_adzuna(keyword, location)
-    except requests.exceptions.RequestException as e:
-        print('JOB SEARCH ERROR:', e)
-        if e.response is not None:
-            print('JOB SEARCH RESPONSE BODY:', e.response.text)
-        return jsonify({'error': 'Could not reach the job search service. Please try again later.'}), 502
+    cache_key = f"search:{keyword.lower()}:{location.lower()}"
+    results = cache.get(cache_key)
+
+    if results is not None:
+        print('CACHE HIT for:', cache_key)
+    else:
+        print('CACHE MISS for:', cache_key)
+        try:
+            if location.lower() == 'remote':
+                results = search_remotive(keyword)
+            else:
+                results = search_adzuna(keyword, location)
+        except requests.exceptions.RequestException as e:
+            print('JOB SEARCH ERROR:', e)
+            if e.response is not None:
+                print('JOB SEARCH RESPONSE BODY:', e.response.text)
+            return jsonify({'error': 'Could not reach the job search service. Please try again later.'}), 502
+
+        cache.set(cache_key, results, timeout=300)
 
     if not results:
         return jsonify({'results': [], 'message': 'No jobs found. Try a different keyword or location.'})
