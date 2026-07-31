@@ -128,7 +128,8 @@ Live Demo
 
 Deployed app (via load balancer): http://44.204.238.87/
 
-Demo video: [link to be added]
+Demo video: [link to my video](https://youtu.be/nDGCGG-1dUA)
+
 
 Credentials for Grading
 
