@@ -83,18 +83,30 @@ On each web server:
 4. Created the database tables with a one-off command (db.create_all() via the app context), since Gunicorn doesn't trigger the app's if name == 'main' block.
 5. Ran Gunicorn as a systemd service (jobfinder.service) bound to 127.0.0.1:8000, so it restarts automatically on crash or reboot.
 6. Configured Nginx as a reverse proxy, forwarding all traffic on port 80 to Gunicorn on port 8000.
+7. I also 
 
 
 On the load balancer (Lb01):
 
-HAProxy's backend web_servers block lists both Web01 and Web02, each checked with check for health monitoring.
-Configured with balance source (sticky sessions based on client IP) rather than plain round-robin.
+Traffic is routed through HAProxy, running on `lb-01`, which load-balances requests between `web-01` and `web-02`. HAProxy listens on both port 80 (HTTP) and port 443 (HTTPS) and forwards requests to the backend servers regardless of which domain (root or `www`) was used to reach it. It was configured with balance source (sticky sessions based on client IP) rather than plain round-robin.
 
 
 Why sticky sessions?
 
 
 Each web server keeps its own local SQLite database. With plain round-robin balancing, a single user's requests could bounce between servers mid-session for example: registering an account on Web01, then getting logged out because Web02 has no record of that account. balance source ensures a given visitor is consistently routed to the same backend server for the life of their session, while different visitors are still distributed across both servers. This keeps the app fully functional without requiring a separate shared database server.
+
+Domain & HTTPS setup
+
+This project is deployed and accessible via a custom domain:
+
+Live URL: https://ericas.tech (also accessible via https://www.ericas.tech)
+
+DNS Configuration
+My domain `ericas.tech` is registered through .tech domains. DNS is configured with A records pointing both the root domain (`@`) and the `www` subdomain to the public IP address of the load balancer (`lb-01`), which distributes incoming traffic across two backend web servers (`web-01` and `web-02`).
+
+SSL & HTTPS
+The site is secured with a free SSL/TLS certificate issued by Let's Encrypt, covering both `ericas.tech` and `www.ericas.tech`. The certificate is installed on the load balancer and is set to auto-renew, with a deployment hook that automatically updates HAProxy's configuration whenever the certificate is renewed.
 
 
 Bonus Features Implemented
@@ -126,7 +138,9 @@ Challenges & How They Were Solved
 
 Live Demo
 
-Deployed app (via load balancer): http://44.204.238.87/
+Deployed app (via load balancer): http://44.204.238.87/ 
+
+Domain setup with SSL: https://ericas.tech or https://www.ericas.tech
 
 Demo video: [link to my video](https://youtu.be/nDGCGG-1dUA)
 
