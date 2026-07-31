@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>My Favorite Scholarships</h1>
+<h1>My Favorite Jobs/Internship</h1>
 
 {% if favorites %}
     <div id="favorites-list">
@@ -14,7 +14,7 @@
         {% endfor %}
     </div>
 {% else %}
-    <p>You haven't saved any scholarships yet. Go to <a href="{{ url_for('index') }}">Search</a> to find some.</p>
+    <p>You haven't saved any jobs/internships yet. Go to <a href="{{ url_for('index') }}">Search</a> to find some.</p>
 {% endif %}
 
 <script>
